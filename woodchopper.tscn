@@ -1,0 +1,25 @@
+[gd_scene load_steps=4 format=3 uid="uid://cosjlpcbr62rr"]
+
+[ext_resource type="Script" uid="uid://c6oxsclmc0224" path="res://player.gd" id="1_84oo1"]
+[ext_resource type="Texture2D" uid="uid://diyojv3n12op5" path="res://icon.svg" id="1_a6vi8"]
+[ext_resource type="PackedScene" uid="uid://oh48t145y0cc" path="res://tree_chunk.tscn" id="3_sv15j"]
+
+[node name="Woodchopper" type="Node2D"]
+
+[node name="Camera2D" type="Camera2D" parent="."]
+
+[node name="ground" type="ColorRect" parent="."]
+offset_left = -576.0
+offset_top = 192.0
+offset_right = 576.0
+offset_bottom = 320.0
+color = Color(0.3409779, 0.65740025, 0.4186872, 1)
+
+[node name="player" type="Node2D" parent="."]
+position = Vector2(-192, 128)
+script = ExtResource("1_84oo1")
+
+[node name="sprPlayer" type="Sprite2D" parent="player"]
+texture = ExtResource("1_a6vi8")
+
+[node name="treeChunk" parent="." instance=ExtResource("3_sv15j")]
