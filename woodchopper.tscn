@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=3 uid="uid://cosjlpcbr62rr"]
+[gd_scene load_steps=5 format=3 uid="uid://cosjlpcbr62rr"]
 
 [ext_resource type="Script" uid="uid://c6oxsclmc0224" path="res://player.gd" id="1_84oo1"]
 [ext_resource type="Texture2D" uid="uid://diyojv3n12op5" path="res://icon.svg" id="1_a6vi8"]
-[ext_resource type="PackedScene" uid="uid://oh48t145y0cc" path="res://tree_chunk.tscn" id="3_sv15j"]
+[ext_resource type="Script" uid="uid://dkuh2n5dnn3wj" path="res://tree.gd" id="3_sv15j"]
+[ext_resource type="PackedScene" uid="uid://oh48t145y0cc" path="res://tree_chunk.tscn" id="4_y8528"]
 
 [node name="Woodchopper" type="Node2D"]
 
@@ -22,4 +23,7 @@ script = ExtResource("1_84oo1")
 [node name="sprPlayer" type="Sprite2D" parent="player"]
 texture = ExtResource("1_a6vi8")
 
-[node name="treeChunk" parent="." instance=ExtResource("3_sv15j")]
+[node name="tree" type="Node2D" parent="."]
+position = Vector2(0, 128)
+script = ExtResource("3_sv15j")
+tree_chunk = ExtResource("4_y8528")
