@@ -1,65 +1,40 @@
 extends Node2D
 
-const LOG_SIZE:int = 256
-const TREE_STARTING_Y_POS:int = 32
 const Branch = WChData.BranchDirection
+const MAX_SEGMENTS:int = 4
 
+@onready var player: Node2D = $"../Player"
 @export var tree_segment:PackedScene
 @export var first_segment:Node2D
+var segment_positions:Array
 var tree:Array
+var can_take_dmg:bool
+signal tree_anim_finished
 
 func _ready() -> void:
+	first_segment.segment_died.connect(_on_tree_segment_segment_died)
+	segment_positions = []
+	for i in range(0, MAX_SEGMENTS):
+		segment_positions.append(WChData.TREE_START_OFFSET + WChData.LOG_SIZE * -i)
 	tree = []
-	first_segment.position.y = TREE_STARTING_Y_POS
 	tree.append(first_segment)
-	for i in range(1, 3):
+	for i in range(1, MAX_SEGMENTS -1):
 		add_segment()
-
-#func add_to_top(type:int):
-	#var chunk = tree_chunk.instantiate()
-	#add_child(chunk)
-	#chunk.set_type(type)
-	#logs_pile.append(chunk)
-	#update_positions()
-
-#func remove_first():
-	#if not logs_pile.is_empty():
-		#var rand = randi_range(-1, 1)
-		#if logs_pile.back().type == -1:
-			#rand = randi_range(-1, 0)
-		#elif logs_pile.back().type == 1:
-			#rand = randi_range(0 , 1)
-		#add_to_top(rand)
-		#logs_pile[0].queue_free()
-		#logs_pile.pop_front()
-		#update_positions()
-
-#func update_positions():
-	#for i in logs_pile.size():
-		#logs_pile[i].position.y = LOG_SIZE * -i
-
-# VIEW
-
-
-
-
-# CONTROLLER
+	can_take_dmg = true
 
 func add_segment() -> void:
 	var segment = _generate_segment()
 	if segment != null:
 		tree.append(segment)
-		_update_positions()
-
-func _update_positions():
-	for i in tree.size():
-		tree[i].position.y = 32 + (LOG_SIZE * -i)
-		print("i: " +  str(i) + "pos_y: " + str(tree[i].position.y))
+		tree.back().position.y = segment_positions[tree.size()-1]
+		add_child(segment)
 
 func _generate_segment() -> Node2D:
 	var previous:Branch = tree.back().branch
 	var new:Branch = _choose_branch(previous)
+	print(new)
 	var segment = tree_segment.instantiate()
+	segment.segment_died.connect(_on_tree_segment_segment_died)
 	segment.set_branch(new)
 	return segment
 
@@ -73,9 +48,25 @@ func _choose_branch(previous:Branch) -> Branch:
 		options = [Branch.LEFT, Branch.NONE, Branch.RIGHT]
 	return options.pick_random()
 
-# MODEL
-
 func _poll() -> void:
 	if not tree.is_empty():
 		tree[0].queue_free()
 		tree.pop_front()
+
+func _on_tree_segment_segment_died() -> void:
+	can_take_dmg = false
+	player.can_cut = false
+	# TODO: Animacion de romper bloque con particulas
+	tree[0].queue_free()
+	add_segment()
+	tree.pop_front()
+	for i in range(0, tree.size()):
+		tree[i].move_to_target_y(segment_positions[i])
+	await get_tree().create_timer(WChData.SEGM_FALL_DURATION).timeout
+	emit_signal("tree_anim_finished", tree[0].branch)
+	can_take_dmg = true
+
+func _on_player_axe_swung(dmg) -> void:
+	if can_take_dmg:
+		tree[0].decrease_hp(dmg)
+		

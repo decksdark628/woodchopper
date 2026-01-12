@@ -1,60 +1,60 @@
+
+# The tree_segment.gd script is attached to all segments, but in tree.gd, only tree[0] is connected to the segment_died signal (likely via the first segment set in the editor).
+
 extends Node2D
 
 const Branch = WChData.BranchDirection
 
 signal segment_died
 
-@onready var chunk: ColorRect = $sprTreeChunk
 @onready var segment_sprite: Sprite2D = $SegmentSprite
 @onready var breaking_anim: Sprite2D = $BreakingAnim
+@onready var branch_sprite: Sprite2D = $BranchSprite
 var branch:Branch
 var hp:int
-var target_y:int
 
 func _ready() -> void:
-	branch = Branch.NONE
+	#branch = Branch.NONE
 	hp = WChData.MAX_SEGMENT_HP
-	target_y = 0
 	_update_sprite() #change later for a set_view or something
 
 func decrease_hp(n:int):
 	hp -= n
-	_update_breaking_anim()
 	if hp <= 0:
 		segment_died.emit()
+	_update_breaking_anim()
 
 func set_branch(b:Branch):
 	branch = b
 
-func set_target_y(n:int):
-	target_y = n
-
-func move_to_target_y() -> void:
+func move_to_target_y(new_y:int) -> void:
 	var animation = create_tween()
 	animation.tween_property(
-		self, "position.y", target_y, WChData.SEGM_FALL_DURATION
+		self, "position:y", new_y, WChData.SEGM_FALL_DURATION
 		)\
 		.set_trans(Tween.TRANS_BACK)\
 		.set_ease(Tween.EASE_OUT)
 
 func _update_breaking_anim():
 	var frame:int = WChData.MAX_SEGMENT_HP - hp
-	if frame >= 0 && frame <= WChData.MAX_SEGMENT_HP:
+	if frame >= 0 && frame <= WChData.MAX_BREAK_ANIM_SPRITES:
 		breaking_anim.frame = frame
 	else:
-		printerr("tree_segment: _update_breaking_anim error. HP, MAX_HP or Damage are incorrect wrong")
+		breaking_anim.frame = WChData.MAX_BREAK_ANIM_SPRITES
 
 func _update_sprite():
 	match branch:
 		Branch.LEFT:
-			chunk.size.x = WChData.GRID_SIZE * 2
-			chunk.position.x = -192
-			chunk.color = Color(0.0, 0.642, 0.266, 1.0)
+			print("left")
+			branch_sprite.set_flip_h(true)
+			branch_sprite.position = Vector2(-256,12)
+			branch_sprite.visible = true
 		Branch.NONE:
+			print("center")
 			segment_sprite.frame = randi_range(0, WChData.NUM_CENTER_SPRITES - 1)
 		Branch.RIGHT:
-			chunk.size.x = WChData.GRID_SIZE * 2
-			chunk.position.x = -64
-			chunk.color = Color(0.98, 0.119, 0.0, 1.0)
+			print("right")
+			#position = Vector2(256,12)
+			branch_sprite.visible = true
 		_:
 			printerr("tree_chunk.gd: BranchDirection invalido")

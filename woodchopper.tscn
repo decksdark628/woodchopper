@@ -1,13 +1,13 @@
 [gd_scene load_steps=9 format=3 uid="uid://cosjlpcbr62rr"]
 
 [ext_resource type="Script" uid="uid://c6oxsclmc0224" path="res://scripts/player.gd" id="1_84oo1"]
-[ext_resource type="Texture2D" uid="uid://diyojv3n12op5" path="res://icon.svg" id="1_a6vi8"]
 [ext_resource type="Script" uid="uid://1qsdv5rn8y1f" path="res://scripts/woodchopper.gd" id="1_tyyj5"]
 [ext_resource type="Script" uid="uid://dkuh2n5dnn3wj" path="res://scripts/tree.gd" id="3_sv15j"]
 [ext_resource type="PackedScene" uid="uid://oh48t145y0cc" path="res://tree_segment.tscn" id="4_y8528"]
 [ext_resource type="Texture2D" uid="uid://bh7426xrkbi4g" path="res://sprites/grass_and_dirt_bg1.png" id="5_erjnm"]
 [ext_resource type="Texture2D" uid="uid://b6ahl4ucfxftt" path="res://sprites/roots_foreground1.png" id="6_fl47g"]
 [ext_resource type="Texture2D" uid="uid://c50o357kni43h" path="res://sprites/forest_bg1.png" id="6_gy6x0"]
+[ext_resource type="Texture2D" uid="uid://dchdfhnswru8e" path="res://sprites/player_woodchopper.png" id="8_erjnm"]
 
 [node name="Woodchopper" type="Node2D"]
 script = ExtResource("1_tyyj5")
@@ -19,27 +19,24 @@ offset_left = -640.0
 offset_top = -360.0
 offset_right = 640.0
 offset_bottom = 360.0
-color = Color(0.3774646, 0.622068, 0.6745005, 1)
+color = Color(0.30588284, 0.5746597, 0.76039535, 1)
 
 [node name="Forest" type="Sprite2D" parent="Background"]
-visible = false
 texture_filter = 1
 scale = Vector2(4, 4)
 texture = ExtResource("6_gy6x0")
 
 [node name="Tree" type="Node2D" parent="." node_paths=PackedStringArray("first_segment")]
-position = Vector2(0, 128)
 script = ExtResource("3_sv15j")
 tree_segment = ExtResource("4_y8528")
 first_segment = NodePath("TreeSegment")
 
 [node name="TreeSegment" parent="Tree" instance=ExtResource("4_y8528")]
-position = Vector2(0, 32)
+position = Vector2(0, 150)
 
 [node name="Foreground" type="Node2D" parent="."]
 
 [node name="Roots" type="Sprite2D" parent="Foreground"]
-visible = false
 texture_filter = 1
 scale = Vector2(4, 4)
 texture = ExtResource("6_fl47g")
@@ -50,12 +47,14 @@ scale = Vector2(4, 4)
 texture = ExtResource("5_erjnm")
 
 [node name="Player" type="Node2D" parent="." node_paths=PackedStringArray("tree")]
+texture_filter = 1
 position = Vector2(-220, 230)
 script = ExtResource("1_84oo1")
 tree = NodePath("../Tree")
 
 [node name="Sprite2D" type="Sprite2D" parent="Player"]
-texture = ExtResource("1_a6vi8")
+scale = Vector2(4, 4)
+texture = ExtResource("8_erjnm")
 
 [node name="Timer" type="Timer" parent="."]
 wait_time = 30.0
@@ -63,11 +62,13 @@ one_shot = true
 autostart = true
 
 [node name="TimerLabel" type="Label" parent="."]
-offset_left = 376.0
-offset_top = -296.0
-offset_right = 536.0
-offset_bottom = -248.0
+offset_left = -549.0
+offset_top = 297.0
+offset_right = -389.0
+offset_bottom = 345.0
 
 [node name="Camera2D" type="Camera2D" parent="."]
 
+[connection signal="tree_anim_finished" from="Tree" to="Player" method="_on_tree_tree_anim_finished"]
+[connection signal="axe_swung" from="Player" to="Tree" method="_on_player_axe_swung"]
 [connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]

@@ -3,9 +3,11 @@ extends Node2D
 @onready var timer: Timer = $Timer
 @onready var label: Label = $TimerLabel
 var game_over:bool
+var wood_collected:int
 
 func _ready() -> void:
 	game_over = false
+	wood_collected = 0
 
 func _process(delta: float) -> void:
 	if timer != null:
