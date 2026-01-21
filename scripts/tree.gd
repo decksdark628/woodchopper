@@ -32,7 +32,6 @@ func add_segment() -> void:
 func _generate_segment() -> Node2D:
 	var previous:Branch = tree.back().branch
 	var new:Branch = _choose_branch(previous)
-	print(new)
 	var segment = tree_segment.instantiate()
 	segment.segment_died.connect(_on_tree_segment_segment_died)
 	segment.set_branch(new)
@@ -56,7 +55,6 @@ func _poll() -> void:
 func _on_tree_segment_segment_died() -> void:
 	can_take_dmg = false
 	player.can_cut = false
-	# TODO: Animacion de romper bloque con particulas
 	tree[0].queue_free()
 	add_segment()
 	tree.pop_front()
@@ -68,5 +66,5 @@ func _on_tree_segment_segment_died() -> void:
 
 func _on_player_axe_swung(dmg) -> void:
 	if can_take_dmg:
+		tree[0].throw_particles()  
 		tree[0].decrease_hp(dmg)
-		

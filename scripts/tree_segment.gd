@@ -1,6 +1,3 @@
-
-# The tree_segment.gd script is attached to all segments, but in tree.gd, only tree[0] is connected to the segment_died signal (likely via the first segment set in the editor).
-
 extends Node2D
 
 const Branch = WChData.BranchDirection
@@ -10,13 +7,13 @@ signal segment_died
 @onready var segment_sprite: Sprite2D = $SegmentSprite
 @onready var breaking_anim: Sprite2D = $BreakingAnim
 @onready var branch_sprite: Sprite2D = $BranchSprite
+@onready var cpu_particles_2d: CPUParticles2D = $CPUParticles2D
 var branch:Branch
 var hp:int
 
 func _ready() -> void:
-	#branch = Branch.NONE
 	hp = WChData.MAX_SEGMENT_HP
-	_update_sprite() #change later for a set_view or something
+	_update_sprite()
 
 func decrease_hp(n:int):
 	hp -= n
@@ -33,7 +30,7 @@ func move_to_target_y(new_y:int) -> void:
 		self, "position:y", new_y, WChData.SEGM_FALL_DURATION
 		)\
 		.set_trans(Tween.TRANS_BACK)\
-		.set_ease(Tween.EASE_OUT)
+		.set_ease(Tween.EASE_IN)
 
 func _update_breaking_anim():
 	var frame:int = WChData.MAX_SEGMENT_HP - hp
@@ -42,19 +39,18 @@ func _update_breaking_anim():
 	else:
 		breaking_anim.frame = WChData.MAX_BREAK_ANIM_SPRITES
 
+func throw_particles():
+	cpu_particles_2d.emitting = true
+
 func _update_sprite():
 	match branch:
 		Branch.LEFT:
-			print("left")
 			branch_sprite.set_flip_h(true)
 			branch_sprite.position = Vector2(-256,12)
 			branch_sprite.visible = true
 		Branch.NONE:
-			print("center")
 			segment_sprite.frame = randi_range(0, WChData.NUM_CENTER_SPRITES - 1)
 		Branch.RIGHT:
-			print("right")
-			#position = Vector2(256,12)
 			branch_sprite.visible = true
 		_:
 			printerr("tree_chunk.gd: BranchDirection invalido")

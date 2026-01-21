@@ -2,9 +2,11 @@ extends Node2D
 
 const Branch = WChData.BranchDirection
 const LEFT_POS:Vector2 = Vector2(-220, 230)
+# -120, 212
 const RIGHT_POS:Vector2 = Vector2(220, 230)
 
-@onready var sprite_2d: Sprite2D = $Sprite2D
+@onready var animation_player: AnimationPlayer = $Visuals/AnimationPlayer
+@onready var visuals: Node2D = $Visuals
 @export var tree:Node2D
 var hp:int
 var dmg:int
@@ -19,21 +21,22 @@ func initialize_state() -> void:
 	hp = 1
 	dmg = 1 #TODO: set based on item used
 	on_left_side = true
-	position = LEFT_POS
 	can_cut = true
+	animation_player.play("RESET")
 
 func cut():
 	if can_cut:
-		emit_signal("axe_swung", dmg)
+		animation_player.play("hit_tree")
 
 func move_left():
-	position = LEFT_POS
-	sprite_2d.set_flip_h(false)
-	on_left_side = true
+	if on_left_side:
+		animation_player.play("move_limit")
+	else:
+		scale.x = 1
+		on_left_side = true
 
 func move_right():
-	position = RIGHT_POS
-	sprite_2d.set_flip_h(true)
+	scale.x = -1
 	on_left_side = false
 
 func reduce_hp():
@@ -54,3 +57,7 @@ func _on_tree_tree_anim_finished(br_dir:Branch) -> void:
 	if (br_dir == Branch.LEFT && on_left_side) or (br_dir == Branch.RIGHT && !on_left_side):
 		reduce_hp()
 	can_cut = true
+
+func _send_hit_signal() -> void:
+	emit_signal("axe_swung", dmg)
+	animation_player.play("return_to_idle")
