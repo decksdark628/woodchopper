@@ -3,6 +3,7 @@ extends Node2D
 const Branch = WChData.BranchDirection
 const MAX_SEGMENTS:int = 4
 
+@onready var game: Node2D = $".."
 @onready var player: Node2D = $"../Player"
 @export var tree_segment:PackedScene
 @export var first_segment:Node2D
@@ -62,6 +63,7 @@ func _on_tree_segment_segment_died() -> void:
 		tree[i].move_to_target_y(segment_positions[i])
 	await get_tree().create_timer(WChData.SEGM_FALL_DURATION).timeout
 	emit_signal("tree_anim_finished", tree[0].branch)
+	game.increase_wood_counter()
 	can_take_dmg = true
 
 func _on_player_axe_swung(dmg) -> void:

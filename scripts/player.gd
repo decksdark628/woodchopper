@@ -5,6 +5,7 @@ const LEFT_POS:Vector2 = Vector2(-220, 230)
 # -120, 212
 const RIGHT_POS:Vector2 = Vector2(220, 230)
 
+@onready var game: Node2D = $".."
 @onready var animation_player: AnimationPlayer = $Visuals/AnimationPlayer
 @onready var visuals: Node2D = $Visuals
 @export var tree:Node2D
@@ -36,16 +37,19 @@ func move_left():
 		on_left_side = true
 
 func move_right():
-	scale.x = -1
-	on_left_side = false
+	if !on_left_side:
+		animation_player.play("move_limit")
+	else:
+		scale.x = -1
+		on_left_side = false
 
 func reduce_hp():
 	hp -= 1
 	if hp == 0:
-		print("Game Over")
+		game.set_game_over()
 
 func _input(event: InputEvent):
-	if hp > 0:
+	if !game.game_over:
 		if event.is_action_pressed("ui_accept"):
 			cut()
 		elif event.is_action_pressed("ui_left"):
